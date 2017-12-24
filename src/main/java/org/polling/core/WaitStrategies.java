@@ -197,22 +197,21 @@ public final class WaitStrategies {
         return new FibonacciWaitStrategy(multiplier, maximumTimeUnit.toMillis(maximumTime));
     }
 
-    // TODO
-    ///**
-    // * Returns a strategy which sleeps for an amount of time based on the Exception that occurred. The
-    // * {@code function} determines how the sleep time should be calculated for the given
-    // * {@code exceptionClass}. If the exception does not match, a wait time of 0 is returned.
-    // *
-    // * @param function       function to calculate sleep time
-    // * @param exceptionClass class to calculate sleep time from
-    // * @return a wait strategy calculated from the failed attempt
-    // */
-    //public static <T extends Throwable> WaitStrategy exceptionWait(Class<T> exceptionClass,
-    //                                                               Function<T, Long> function) {
-    //    Preconditions.checkNotNull(exceptionClass, "exceptionClass may not be null");
-    //    Preconditions.checkNotNull(function, "function may not be null");
-    //    return new ExceptionWaitStrategy<T>(exceptionClass, function);
-    //}
+    /**
+     * Returns a strategy which sleeps for an amount of time based on the Exception that occurred. The
+     * {@code function} determines how the sleep time should be calculated for the given
+     * {@code exceptionClass}. If the exception does not match, a wait time of 0 is returned.
+     *
+     * @param calculator     calculator to calculate sleep time
+     * @param exceptionClass class to calculate sleep time from
+     * @return a wait strategy calculated from the failed attempt
+     */
+    public static <T extends Throwable> WaitStrategy exceptionWait(Class<T> exceptionClass,
+                                                                   ExceptionWaitCalculator<T> calculator) {
+        Preconditions.checkNotNull(exceptionClass, "exceptionClass may not be null");
+        Preconditions.checkNotNull(calculator, "ExceptionWaitCalculator may not be null");
+        return new ExceptionWaitStrategy<T>(exceptionClass, calculator);
+    }
 
     /**
      * Joins one or more wait strategies to derive a composite wait strategy.
@@ -330,8 +329,8 @@ public final class WaitStrategies {
         }
 
         private long fib(long n) {
-            if (n == 0L) return 0L;
-            if (n == 1L) return 1L;
+            if (n == 0L) { return 0L; }
+            if (n == 1L) { return 1L; }
 
             long prevPrev = 0L;
             long prev = 1L;
@@ -365,25 +364,25 @@ public final class WaitStrategies {
         }
     }
 
-    //private static final class ExceptionWaitStrategy<T extends Throwable> implements WaitStrategy {
-    //    private final Class<T> exceptionClass;
-    //    private final Function<T, Long> function;
-    //
-    //    public ExceptionWaitStrategy(Class<T> exceptionClass, Function<T, Long> function) {
-    //        this.exceptionClass = exceptionClass;
-    //        this.function = function;
-    //    }
-    //
-    //    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions", "unchecked"})
-    //    @Override
-    //    public long computeWaitTime(Attempt lastAttempt) {
-    //        if (lastAttempt.hasException()) {
-    //            Throwable cause = lastAttempt.getExceptionCause();
-    //            if (exceptionClass.isAssignableFrom(cause.getClass())) {
-    //                return function.apply((T) cause);
-    //            }
-    //        }
-    //        return 0L;
-    //    }
-    //}
+    private static final class ExceptionWaitStrategy<T extends Throwable> implements WaitStrategy {
+        private final Class<T>                   exceptionClass;
+        private final ExceptionWaitCalculator<T> calculator;
+
+        public ExceptionWaitStrategy(Class<T> exceptionClass, ExceptionWaitCalculator<T> calculator) {
+            this.exceptionClass = exceptionClass;
+            this.calculator = calculator;
+        }
+
+        @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions", "unchecked"})
+        @Override
+        public long computeWaitTime(Attempt lastAttempt) {
+            if (lastAttempt.hasException()) {
+                Throwable cause = lastAttempt.getExceptionCause();
+                if (exceptionClass.isAssignableFrom(cause.getClass())) {
+                    return calculator.calculateWaitTime((T) cause);
+                }
+            }
+            return 0L;
+        }
+    }
 }

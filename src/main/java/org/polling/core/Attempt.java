@@ -18,18 +18,19 @@ package org.polling.core;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 /**
  *
  * @author dingye
  */
 public class Attempt {
-    // TODO 把Attempt整理成为接口
     private final int attemptNumber;
     private final long startTime;
     private final long lastEndTime;
     private final Throwable cause;
 
-    public Attempt(int attemptNumber, long startTime, long lastEndTime, Throwable cause) {
+    public Attempt(int attemptNumber, long startTime, long lastEndTime, @Nullable Throwable cause) {
         this.attemptNumber = attemptNumber;
         this.startTime = startTime;
         this.lastEndTime = lastEndTime;

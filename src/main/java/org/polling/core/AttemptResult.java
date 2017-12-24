@@ -16,6 +16,8 @@
 
 package org.polling.core;
 
+import javax.annotation.Nullable;
+
 /**
  *
  * @author dingye
@@ -27,7 +29,7 @@ public class AttemptResult<V> {
     private final String message;
     private final Throwable cause;
 
-    public AttemptResult(AttemptState state, V result, String message, Throwable cause) {
+    public AttemptResult(AttemptState state, V result, String message, @Nullable Throwable cause) {
         this.state = state;
         this.result = result;
         this.message = message;

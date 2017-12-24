@@ -22,6 +22,10 @@ package org.polling.core;
  *
  */
 public final class AttemptResults {
+    public static AttemptResult<Void> justComplete() {
+        return new AttemptResult<Void>(AttemptState.COMPLETE, null, "", null);
+    }
+
     public static <V> AttemptResult<V> completeWith(V result) {
         return new AttemptResult<V>(AttemptState.COMPLETE, result, "", null);
     }

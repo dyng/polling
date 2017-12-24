@@ -22,6 +22,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.polling.Poller;
+import org.polling.exception.PollingInterruptedException;
+import org.polling.exception.PollingStopException;
+import org.polling.exception.UserBreakException;
 
 /**
  *
@@ -68,15 +71,14 @@ public class DefaultPoller<V> implements Poller<V> {
                 AttemptResult<V> result;
                 try {
                     result = maker.process();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     result = AttemptResults.continueFor(e);
                 }
 
                 AttemptState state = result.getState();
 
                 if (state == AttemptState.BREAK) {
-                    // TODO: 更好的异常
-                    throw new RuntimeException("UserException. Message: " + result.getMessage());
+                    throw new UserBreakException(result.getMessage(), result.getCause());
                 }
 
                 if (state == AttemptState.COMPLETE) {
@@ -85,8 +87,7 @@ public class DefaultPoller<V> implements Poller<V> {
 
                 Attempt failedAttempt = buildAttempt(attemptCount, startTime, System.nanoTime(), result.getCause());
                 if (stopStrategy.shouldStop(failedAttempt)) {
-                    // TODO: 更好的异常
-                    throw new RuntimeException("StopStrategy makes further polling stopped.");
+                    throw new PollingStopException();
                 }
 
                 long waitTime = waitStrategy.computeWaitTime(failedAttempt);
@@ -95,8 +96,7 @@ public class DefaultPoller<V> implements Poller<V> {
                     Thread.sleep(waitTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    // TODO: 更好的异常
-                    throw new RuntimeException("Thread interrupted in waiting.");
+                    throw new PollingInterruptedException();
                 }
             }
         }

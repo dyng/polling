@@ -19,7 +19,7 @@ package org.polling.core;
 /**
  *
  * @author dingye
- * @date 2017/12/22
+ *
  */
 public class AttemptResult<V> {
     private final AttemptState state;

@@ -21,10 +21,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.polling.Poller;
+
 /**
  *
  * @author dingye
- * @date 2017/12/22
  */
 public class DefaultPoller<V> implements Poller<V> {
     private final AtomicBoolean started;

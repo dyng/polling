@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.google.common.base.Preconditions;
+import org.polling.util.Preconditions;
 
 /**
  * Factory class for {@link StopStrategy} instances.

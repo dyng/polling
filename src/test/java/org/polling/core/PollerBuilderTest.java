@@ -3,13 +3,15 @@ package org.polling.core;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.polling.Poller;
+import org.polling.PollerBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
  * @author dingye
- * @date 2017/12/22
+ *
  */
 public class PollerBuilderTest {
     @Test

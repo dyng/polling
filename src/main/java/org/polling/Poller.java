@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.polling.core;
+package org.polling;
 
 import java.util.concurrent.Future;
 
 /**
  *
+ *
  * @author dingye
- * @date 2017/12/22
  */
 public interface Poller<V> {
     /**

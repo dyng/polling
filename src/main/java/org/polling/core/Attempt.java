@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  * @author dingye
- * @date 2017/12/22
  */
 public class Attempt {
     // TODO 把Attempt整理成为接口

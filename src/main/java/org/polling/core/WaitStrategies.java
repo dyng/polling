@@ -16,12 +16,13 @@
 
 package org.polling.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import org.polling.util.Preconditions;
 
 /**
  * Factory class for instances of {@link WaitStrategy}.
@@ -222,7 +223,8 @@ public final class WaitStrategies {
      */
     public static WaitStrategy join(WaitStrategy... waitStrategies) {
         Preconditions.checkState(waitStrategies.length > 0, "Must have at least one wait strategy");
-        List<WaitStrategy> waitStrategyList = Lists.newArrayList(waitStrategies);
+        List<WaitStrategy> waitStrategyList = new ArrayList<WaitStrategy>();
+        waitStrategyList.addAll(Arrays.asList(waitStrategies));
         Preconditions.checkState(!waitStrategyList.contains(null), "Cannot have a null wait strategy");
         return new CompositeWaitStrategy(waitStrategyList);
     }

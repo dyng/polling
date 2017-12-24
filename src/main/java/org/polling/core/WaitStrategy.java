@@ -19,7 +19,7 @@ package org.polling.core;
 /**
  *
  * @author dingye
- * @date 2017/12/22
+ *
  */
 public interface WaitStrategy {
 

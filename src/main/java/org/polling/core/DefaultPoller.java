@@ -96,7 +96,7 @@ public class DefaultPoller<V> implements Poller<V> {
                     Thread.sleep(waitTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new PollingInterruptedException();
+                    throw new PollingInterruptedException(e);
                 }
             }
         }

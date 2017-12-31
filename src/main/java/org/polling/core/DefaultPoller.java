@@ -22,11 +22,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.polling.Poller;
-import org.polling.exception.PollingInterruptedException;
-import org.polling.exception.PollingStopException;
+import org.polling.exception.PollerInterruptedException;
+import org.polling.exception.PollerStoppedException;
 import org.polling.exception.UserBreakException;
 
 /**
+ * Default implementation of {@link Poller}.
  *
  * @author dingye
  */
@@ -48,7 +49,7 @@ public class DefaultPoller<V> implements Poller<V> {
     @Override
     public Future<V> start() {
         if (!started.compareAndSet(false, true)) {
-            throw new IllegalStateException("Poller already started.");
+            throw new IllegalStateException("Poller already started");
         }
         return executor.submit(new PollerCallable<V>(maker, stopStrategy, waitStrategy));
     }
@@ -75,19 +76,23 @@ public class DefaultPoller<V> implements Poller<V> {
                     result = AttemptResults.continueFor(e);
                 }
 
+                if (result == null) {
+                    throw new IllegalStateException("AttemptMaker has returned a null result");
+                }
+
                 AttemptState state = result.getState();
 
                 if (state == AttemptState.BREAK) {
                     throw new UserBreakException(result.getMessage(), result.getCause());
                 }
 
-                if (state == AttemptState.COMPLETE) {
+                if (state == AttemptState.FINISH) {
                     return result.getResult();
                 }
 
                 Attempt failedAttempt = buildAttempt(attemptCount, startTime, System.nanoTime(), result.getCause());
                 if (stopStrategy.shouldStop(failedAttempt)) {
-                    throw new PollingStopException();
+                    throw new PollerStoppedException();
                 }
 
                 long waitTime = waitStrategy.computeWaitTime(failedAttempt);
@@ -96,13 +101,13 @@ public class DefaultPoller<V> implements Poller<V> {
                     Thread.sleep(waitTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new PollingInterruptedException(e);
+                    throw new PollerInterruptedException(e);
                 }
             }
         }
 
         private Attempt buildAttempt(int attemptNumber, long startTime, long lastEndTime, Throwable cause) {
-            return new Attempt(attemptNumber, startTime, lastEndTime, cause);
+            return new DefaultAttempt(attemptNumber, startTime, lastEndTime, cause);
         }
     }
 }

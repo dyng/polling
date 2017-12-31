@@ -17,9 +17,9 @@
 package org.polling.core;
 
 /**
+ * An user instruction to determine if next polling will be invoked.
  *
  * @author dingye
- *
  */
 public enum AttemptState {
     /**
@@ -33,7 +33,7 @@ public enum AttemptState {
     BREAK,
 
     /**
-     * means: polling eventually finished
+     * means: polling finished
      */
-    COMPLETE;
+    FINISH;
 }

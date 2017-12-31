@@ -17,28 +17,64 @@
 package org.polling.core;
 
 /**
+ * Factory class for instances of {@link AttemptResult}.
  *
  * @author dingye
- *
  */
 public final class AttemptResults {
-    public static AttemptResult<Void> justComplete() {
-        return new AttemptResult<Void>(AttemptState.COMPLETE, null, "", null);
+    /**
+     * Return an {@link AttemptResult} that will end polling without result.
+     *
+     * @return an attempt result
+     */
+    public static AttemptResult<Void> justFinish() {
+        return new AttemptResult<Void>(AttemptState.FINISH, null, "", null);
     }
 
-    public static <V> AttemptResult<V> completeWith(V result) {
-        return new AttemptResult<V>(AttemptState.COMPLETE, result, "", null);
+    /**
+     * Return an {@link AttemptResult} that will end polling with given result.
+     *
+     * @param result
+     * @param <V>
+     * @return an attempt result
+     */
+    public static <V> AttemptResult<V> finishWith(V result) {
+        return new AttemptResult<V>(AttemptState.FINISH, result, "", null);
     }
 
+    /**
+     * Return an {@link AttemptResult} that will break polling and throw an {@link org.polling.exception.UserBreakException}.
+     *
+     * @param message message about reason
+     * @param <V>  return type of poller
+     * @return an attempt result
+     */
     public static <V> AttemptResult<V> breakFor(String message) {
         return new AttemptResult<V>(AttemptState.BREAK, null, message, null);
     }
 
+    /**
+     * Return an {@link AttemptResult} that will break polling and throw an {@link org.polling.exception.UserBreakException}.
+     *
+     * @param cause reason of user break
+     * @param <V>  return type of poller
+     * @return an attempt result
+     */
+    public static <V> AttemptResult<V> breakFor(Throwable cause) {
+        return new AttemptResult<V>(AttemptState.BREAK, null, cause.getMessage(), cause);
+    }
+
+    /**
+     * Return an {@link AttemptResult} that makes polling continue.
+     *
+     * @param <V> return type of poller
+     * @return an attempt result
+     */
     public static <V> AttemptResult<V> justContinue() {
         return new AttemptResult<V>(AttemptState.CONTINUE, null, "", null);
     }
 
     public static <V> AttemptResult<V> continueFor(Throwable cause) {
-        return new AttemptResult<V>(AttemptState.COMPLETE, null, "", cause);
+        return new AttemptResult<V>(AttemptState.CONTINUE, null, "", cause);
     }
 }

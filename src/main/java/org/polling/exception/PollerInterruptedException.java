@@ -13,11 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.polling.core;
+package org.polling.exception;
 
 /**
+ * An exception which implies the worker thread is interrupted during polling.
+ *
  * Created by dingye on 17/12/24.
  */
-public interface ExceptionWaitCalculator<T extends Throwable> {
-    Long calculateWaitTime(T throwable);
+public class PollerInterruptedException extends RuntimeException {
+    public PollerInterruptedException() {
+    }
+
+    public PollerInterruptedException(String message) {
+        super(message);
+    }
+
+    public PollerInterruptedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public PollerInterruptedException(Throwable cause) {
+        super(cause);
+    }
 }

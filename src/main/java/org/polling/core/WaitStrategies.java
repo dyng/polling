@@ -1,6 +1,8 @@
 /*
  * Copyright 2012-2015 Ray Holder
  *
+ * Modifications copyright 2017 Ye Ding
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -207,7 +209,7 @@ public final class WaitStrategies {
      * @return a wait strategy calculated from the failed attempt
      */
     public static <T extends Throwable> WaitStrategy exceptionWait(Class<T> exceptionClass,
-                                                                   ExceptionWaitCalculator<T> calculator) {
+                                                                   ExceptionWaitHandler<T> calculator) {
         Preconditions.checkNotNull(exceptionClass, "exceptionClass may not be null");
         Preconditions.checkNotNull(calculator, "ExceptionWaitCalculator may not be null");
         return new ExceptionWaitStrategy<T>(exceptionClass, calculator);
@@ -365,10 +367,10 @@ public final class WaitStrategies {
     }
 
     private static final class ExceptionWaitStrategy<T extends Throwable> implements WaitStrategy {
-        private final Class<T>                   exceptionClass;
-        private final ExceptionWaitCalculator<T> calculator;
+        private final Class<T>                exceptionClass;
+        private final ExceptionWaitHandler<T> calculator;
 
-        public ExceptionWaitStrategy(Class<T> exceptionClass, ExceptionWaitCalculator<T> calculator) {
+        public ExceptionWaitStrategy(Class<T> exceptionClass, ExceptionWaitHandler<T> calculator) {
             this.exceptionClass = exceptionClass;
             this.calculator = calculator;
         }
@@ -379,7 +381,7 @@ public final class WaitStrategies {
             if (lastAttempt.hasException()) {
                 Throwable cause = lastAttempt.getExceptionCause();
                 if (exceptionClass.isAssignableFrom(cause.getClass())) {
-                    return calculator.calculateWaitTime((T) cause);
+                    return calculator.computeWaitTime((T) cause);
                 }
             }
             return 0L;

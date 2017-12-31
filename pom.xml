@@ -46,6 +46,12 @@
             <version>2.8.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>joor</artifactId>
+            <version>0.9.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

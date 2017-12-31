@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.polling.exception;
+package org.polling.core;
 
 /**
+ * An handler to compute next waiting time based on caught exception.
+ *
  * Created by dingye on 17/12/24.
  */
-public class PollingStopException extends RuntimeException {
-    public PollingStopException() {
-    }
-
-    public PollingStopException(String message) {
-        super(message);
-    }
-
-    public PollingStopException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public PollingStopException(Throwable cause) {
-        super(cause);
-    }
+public interface ExceptionWaitHandler<T extends Throwable> {
+    /**
+     * Returns the time, in milliseconds, to sleep before retrying.
+     *
+     * @param throwable exception that is thrown.
+     * @return the sleep time before next attempt
+     */
+    long computeWaitTime(T throwable);
 }

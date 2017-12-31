@@ -1,5 +1,7 @@
 /*
- * Copyright 2012-2015 Ye Ding
+ * Copyright 2012-2015 Ray Holder
+ *
+ * Modifications copyright 2017 Ye Ding
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +18,6 @@
 
 package org.polling.core;
 
-/**
- *
- * @author dingye
- *
- */
 public interface WaitStrategy {
 
     /**

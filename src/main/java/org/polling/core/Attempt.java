@@ -1,5 +1,7 @@
 /*
- * Copyright 2012-2015 Ye Ding
+ * Copyright 2012-2015 Ray Holder
+ *
+ * Modifications copyright 2017 Ye Ding
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +18,40 @@
 
 package org.polling.core;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-
 /**
+ * An attempt of a call, with information about whether an exception is occurred, etc.
  *
  * @author dingye
  */
-public class Attempt {
-    private final int attemptNumber;
-    private final long startTime;
-    private final long lastEndTime;
-    private final Throwable cause;
+public interface Attempt {
+    /**
+     * The number, starting from 1, of this attempt.
+     *
+     * @return the attempt number
+     */
+    long getAttemptNumber();
 
-    public Attempt(int attemptNumber, long startTime, long lastEndTime, @Nullable Throwable cause) {
-        this.attemptNumber = attemptNumber;
-        this.startTime = startTime;
-        this.lastEndTime = lastEndTime;
-        this.cause = cause;
-    }
+    /**
+     * Tells if the call threw an exception or not
+     *
+     * @return <code>true</code> if the call threw an exception, <code>false</code>
+     *         if it returned a result
+     */
+    boolean hasException();
 
-    public int getAttemptNumber() {
-        return attemptNumber;
-    }
+    /**
+     * Gets the exception thrown by the call
+     *
+     * @return the exception thrown by the call
+     * @throws IllegalStateException if the call didn't throw an exception,
+     *                               as indicated by {@link #hasException()}
+     */
+    Throwable getExceptionCause();
 
-    public boolean hasException() {
-        return cause != null;
-    }
-
-    public Throwable getExceptionCause() {
-        return cause;
-    }
-
-    public long getDelaySinceFirstAttempt() {
-        return TimeUnit.NANOSECONDS.toMillis(lastEndTime - startTime);
-    }
+    /**
+     * The delay since the start of the first attempt, in milliseconds.
+     *
+     * @return the delay since the start of the first attempt, in milliseconds
+     */
+    long getDelaySinceFirstAttempt();
 }

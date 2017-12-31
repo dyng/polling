@@ -17,10 +17,15 @@
 package org.polling.core;
 
 /**
- *
+ * An user defined code which will be executed as the polling body.
  *
  * @author dingye
  */
 public interface AttemptMaker<V> {
+    /**
+     * Do the actual polling action.
+     *
+     * @return an attempt result
+     */
     AttemptResult<V> process();
 }

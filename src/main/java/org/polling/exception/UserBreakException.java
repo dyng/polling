@@ -16,6 +16,8 @@
 package org.polling.exception;
 
 /**
+ * An exception implies polling is aborted because of an user break.
+ *
  * Created by dingye on 17/12/24.
  */
 public class UserBreakException extends RuntimeException {

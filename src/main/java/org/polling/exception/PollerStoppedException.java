@@ -16,21 +16,23 @@
 package org.polling.exception;
 
 /**
+ * An exception implies polling is stopped by a {@link org.polling.core.StopStrategy}.
+ *
  * Created by dingye on 17/12/24.
  */
-public class PollingInterruptedException extends RuntimeException {
-    public PollingInterruptedException() {
+public class PollerStoppedException extends RuntimeException {
+    public PollerStoppedException() {
     }
 
-    public PollingInterruptedException(String message) {
+    public PollerStoppedException(String message) {
         super(message);
     }
 
-    public PollingInterruptedException(String message, Throwable cause) {
+    public PollerStoppedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public PollingInterruptedException(Throwable cause) {
+    public PollerStoppedException(Throwable cause) {
         super(cause);
     }
 }

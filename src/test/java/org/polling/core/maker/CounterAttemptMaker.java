@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.polling.core.maker;
 
-package org.polling;
-
-import java.util.concurrent.Future;
+import org.polling.core.AttemptMaker;
+import org.polling.core.AttemptResult;
+import org.polling.core.AttemptResults;
 
 /**
- * A poller will do some work periodically, and stops if a {@link org.polling.core.StopStrategy} is fulfilled.
- * The interval of every single execution is determined by {@link org.polling.core.WaitStrategy}.
- *
- * @param <V> the type of result
- * @author dingye
+ * Created by dingye on 17/12/31.
  */
-public interface Poller<V> {
-    /**
-     * Start this poller.
-     *
-     * @return future of polling result
-     */
-    Future<V> start();
+public class CounterAttemptMaker implements AttemptMaker<Void> {
+    private int count = 0;
+
+    @Override
+    public AttemptResult<Void> process() {
+        count++;
+        return AttemptResults.justContinue();
+    }
+
+    public int getCount() {
+        return count;
+    }
 }

@@ -19,9 +19,11 @@ package org.polling.core;
 import javax.annotation.Nullable;
 
 /**
+ * Result of a single attempt.
+ * <p/>
+ * As a rule of thumb, always use {@link AttemptResults} to create {@link AttemptResult}.
  *
  * @author dingye
- *
  */
 public class AttemptResult<V> {
     private final AttemptState state;
@@ -29,7 +31,7 @@ public class AttemptResult<V> {
     private final String message;
     private final Throwable cause;
 
-    public AttemptResult(AttemptState state, V result, String message, @Nullable Throwable cause) {
+    AttemptResult(AttemptState state, V result, String message, @Nullable Throwable cause) {
         this.state = state;
         this.result = result;
         this.message = message;

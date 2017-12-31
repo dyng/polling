@@ -83,7 +83,7 @@ public class PollerBuilder<V> {
     }
 
     /**
-     * Sets the body of polling.
+     * Sets the code of actual polling.
      *
      * @param attemptMaker the polling body.
      * @return <code>this</code>

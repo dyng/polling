@@ -173,7 +173,7 @@ public class WaitStrategiesTest {
     }
 
     public Attempt failedAttempt(long attemptNumber, long delaySinceFirstAttempt) {
-        return new DefaultAttempt(attemptNumber, 0L, delaySinceFirstAttempt, null);
+        return new DefaultAttempt(attemptNumber, 0L, delaySinceFirstAttempt, new RuntimeException());
     }
 
     public Attempt failedRetryAfterAttempt(long attemptNumber, long delaySinceFirstAttempt) {

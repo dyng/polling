@@ -26,6 +26,7 @@ public interface AttemptMaker<V> {
      * Do the actual polling action.
      *
      * @return an attempt result
+     * @throws Exception any Exception will be caught by poller
      */
-    AttemptResult<V> process();
+    AttemptResult<V> process() throws Exception;
 }

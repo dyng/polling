@@ -1,0 +1,57 @@
+/*
+ * Copyright 2012-2015 Ray Holder
+ *
+ * Modifications copyright 2017 Ye Ding
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.dyngr.core;
+
+/**
+ * An attempt of a call, with information about whether an exception is occurred, etc.
+ *
+ * @author dingye
+ */
+public interface Attempt {
+    /**
+     * The number, starting from 1, of this attempt.
+     *
+     * @return the attempt number
+     */
+    long getAttemptNumber();
+
+    /**
+     * Tells if the call threw an exception or not
+     *
+     * @return <code>true</code> if the call threw an exception, <code>false</code>
+     *         if it returned a result
+     */
+    boolean hasException();
+
+    /**
+     * Gets the exception thrown by the call
+     *
+     * @return the exception thrown by the call
+     * @throws IllegalStateException if the call didn't throw an exception,
+     *                               as indicated by {@link #hasException()}
+     */
+    Throwable getExceptionCause();
+
+    /**
+     * The delay since the start of the first attempt, in milliseconds.
+     *
+     * @return the delay since the start of the first attempt, in milliseconds
+     */
+    long getDelaySinceFirstAttempt();
+}

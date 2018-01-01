@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 
 /**
  * Result of a single attempt.
- * <p/>
+ * <p></p>
  * As a rule of thumb, always use {@link AttemptResults} to create {@link AttemptResult}.
  *
  * @author dingye

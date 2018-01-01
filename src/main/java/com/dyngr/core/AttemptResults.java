@@ -36,8 +36,8 @@ public final class AttemptResults {
     /**
      * Return an {@link AttemptResult} that will end polling with given result.
      *
-     * @param result
-     * @param <V>
+     * @param result result of a successful attempt
+     * @param <V>  return type of poller
      * @return an attempt result
      */
     public static <V> AttemptResult<V> finishWith(V result) {

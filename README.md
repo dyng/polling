@@ -1,4 +1,5 @@
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://travis-ci.org/dyng/polling)
+[![Travis](https://img.shields.io/travis/dyng/polling.svg)](https://travis-ci.org/dyng/polling)
+[![license](https://img.shields.io/github/license/dyng/polling.svg)](https://raw.githubusercontent.com/dyng/polling/master/LICENSE)
 
 # What Is This
 

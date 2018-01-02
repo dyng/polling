@@ -67,7 +67,7 @@ public class DefaultPoller<V> implements Poller<V> {
 
         @Override
         public V call() throws Exception {
-            long startTime = System.nanoTime();
+            long startTime = System.currentTimeMillis();
             for (int attemptCount = 1; ;attemptCount++) {
                 AttemptResult<V> result;
                 try {
@@ -90,7 +90,7 @@ public class DefaultPoller<V> implements Poller<V> {
                     return result.getResult();
                 }
 
-                Attempt failedAttempt = buildAttempt(attemptCount, startTime, System.nanoTime(), result.getCause());
+                Attempt failedAttempt = buildAttempt(attemptCount, startTime, System.currentTimeMillis(), result.getCause());
                 if (stopStrategy.shouldStop(failedAttempt)) {
                     throw new PollerStoppedException();
                 }

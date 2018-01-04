@@ -81,7 +81,13 @@ The power of Polling is even more than above example. Many builtin `StopStrategy
 
 ## Maven
 
-TODO
+```xml
+<dependency>
+    <groupId>com.dyngr</groupId>
+    <artifactId>polling</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
 
 # Thanks
 

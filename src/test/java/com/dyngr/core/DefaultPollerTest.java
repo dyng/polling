@@ -146,6 +146,118 @@ public class DefaultPollerTest {
     }
 
     @Test
+    public void testPoller_stops_if_exception() throws Exception {
+        // prepare
+        final AtomicLong attemptsCount = new AtomicLong(0);
+        Poller<Void> poller = PollerBuilder.<Void>newBuilder()
+                .polling(new AttemptMaker<Void>() {
+                    @Override
+                    public AttemptResult<Void> process() throws Exception {
+                        attemptsCount.incrementAndGet();
+                        throw new IllegalStateException();
+                    }
+                })
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
+
+        // verify
+        try {
+            poller.start().get();
+            fail();
+        } catch (ExecutionException e) {
+            assertThat(e.getCause())
+                    .isInstanceOf(PollerStoppedException.class);
+            assertThat(attemptsCount.get()).isEqualTo(1);
+        }
+    }
+
+    @Test
+    public void testPoller_does_not_stop_if_NotStopEvenExceptionStrategy_is_configured() throws Exception {
+        // prepare
+        final AtomicLong attemptsCount = new AtomicLong(0);
+        Poller<Void> poller = PollerBuilder.<Void>newBuilder()
+                .polling(new AttemptMaker<Void>() {
+                    @Override
+                    public AttemptResult<Void> process() throws Exception {
+                        attemptsCount.incrementAndGet();
+                        throw new IllegalStateException();
+                    }
+                })
+                .withStopStrategy(
+                        StopStrategies.notStopEvenException(),
+                        StopStrategies.stopAfterAttempt(3)
+                )
+                .build();
+
+        // verify
+        try {
+            poller.start().get();
+            fail();
+        } catch (ExecutionException e) {
+            assertThat(e.getCause())
+                    .isInstanceOf(PollerStoppedException.class);
+            assertThat(attemptsCount.get()).isEqualTo(3);
+        }
+    }
+
+    @Test
+    public void testPoller_multiple_stop_strategies() throws Exception {
+        // prepare
+        // CounterAttemptMaker
+        CounterAttemptMaker maker1 = new CounterAttemptMaker();
+        Poller<Void> poller = PollerBuilder.<Void>newBuilder()
+                .polling(maker1)
+                .withStopStrategy(
+                        StopStrategies.stopAfterAttempt(3),
+                        StopStrategies.stopAfterDelay(1, TimeUnit.SECONDS)
+                )
+                .build();
+
+        try {
+            poller.start().get();
+            fail();
+        } catch (ExecutionException e) {
+            assertThat(e.getCause()).isInstanceOf(PollerStoppedException.class);
+            assertThat(maker1.getCount()).isEqualTo(3);
+        }
+
+        // TimerAttemptMaker
+        TryFixedTimesAttemptMaker maker2 = new TryFixedTimesAttemptMaker(3);
+        poller = PollerBuilder.<Void>newBuilder()
+                .polling(maker2)
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(
+                        StopStrategies.stopAfterAttempt(3),
+                        StopStrategies.stopAfterDelay(500, TimeUnit.MILLISECONDS)
+                )
+                .build();
+
+        try {
+            poller.start().get();
+            fail();
+        } catch (ExecutionException e) {
+            assertThat(e.getCause()).isInstanceOf(PollerStoppedException.class);
+            assertThat(maker2.getTriedNum()).isEqualTo(2);
+        }
+    }
+
+    @Test
+    public void testPoller_multiple_wait_strategies() throws Exception {
+        // TimerAttemptMaker
+        TimerAttemptMaker maker = new TimerAttemptMaker();
+        Poller<Void> poller = PollerBuilder.<Void>newBuilder()
+                .polling(maker)
+                .withWaitStrategy(
+                        WaitStrategies.fixedWait(500, TimeUnit.MILLISECONDS),
+                        WaitStrategies.fixedWait(500, TimeUnit.MILLISECONDS)
+                )
+                .build();
+
+        poller.start().get();
+        assertThat(maker.getElapsedTime()).isGreaterThanOrEqualTo(1000);
+    }
+
+    @Test
     public void testAttemptResult_user_break() throws Exception {
         // prepare
         Poller<Void> poller = PollerBuilder.<Void>newBuilder()

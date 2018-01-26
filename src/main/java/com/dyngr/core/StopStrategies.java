@@ -18,11 +18,19 @@
 
 package com.dyngr.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
 
+import com.dyngr.core.strategy.CompositeStopStrategy;
+import com.dyngr.core.strategy.NotStopEvenExceptionStrategy;
+import com.dyngr.core.strategy.NeverStopStrategy;
+import com.dyngr.core.strategy.StopAfterAttemptStrategy;
+import com.dyngr.core.strategy.StopAfterDelayStrategy;
+import com.dyngr.core.strategy.StopIfExceptionStrategy;
 import com.dyngr.util.Preconditions;
 
 /**
@@ -45,6 +53,15 @@ public final class StopStrategies {
      */
     public static StopStrategy neverStop() {
         return NEVER_STOP;
+    }
+
+    /**
+     * Returns a SPECIAL stop strategy which instruct Poller NOT to stop even exception occurred.
+     *
+     * @return a stop strategy which instruct Poller NOT to stop even exception occurred.
+     */
+    public static StopStrategy notStopEvenException() {
+        return new NotStopEvenExceptionStrategy();
     }
 
     /**
@@ -82,49 +99,18 @@ public final class StopStrategies {
         return new StopAfterDelayStrategy(timeUnit.toMillis(duration));
     }
 
-    @Immutable
-    private static final class NeverStopStrategy implements StopStrategy {
-        @Override
-        public boolean shouldStop(Attempt failedAttempt) {
-            return false;
-        }
-    }
-
-    @Immutable
-    private static final class StopAfterAttemptStrategy implements StopStrategy {
-        private final int maxAttemptNumber;
-
-        public StopAfterAttemptStrategy(int maxAttemptNumber) {
-            Preconditions.checkArgument(maxAttemptNumber >= 1, "maxAttemptNumber must be >= 1 but is %d", maxAttemptNumber);
-            this.maxAttemptNumber = maxAttemptNumber;
-        }
-
-        @Override
-        public boolean shouldStop(Attempt failedAttempt) {
-            return failedAttempt.getAttemptNumber() >= maxAttemptNumber;
-        }
-    }
-
-    @Immutable
-    private static final class StopAfterDelayStrategy implements StopStrategy {
-        private final long maxDelay;
-
-        public StopAfterDelayStrategy(long maxDelay) {
-            Preconditions.checkArgument(maxDelay >= 0L, "maxDelay must be >= 0 but is %d", maxDelay);
-            this.maxDelay = maxDelay;
-        }
-
-        @Override
-        public boolean shouldStop(Attempt failedAttempt) {
-            return failedAttempt.getDelaySinceFirstAttempt() >= maxDelay;
-        }
-    }
-
-    @Immutable
-    private static final class StopIfExceptionStrategy implements StopStrategy {
-        @Override
-        public boolean shouldStop(Attempt failedAttempt) {
-            return failedAttempt.hasException();
-        }
+    /**
+     * Joins one or more stop strategies to derive a composite stop strategy.
+     * The new joined strategy will stop if any underlying stop strategy says so.
+     *
+     * @param  stopStrategies stop strategies that need to be checked one by one.
+     * @return A composite wait strategy
+     */
+    public static StopStrategy join(StopStrategy... stopStrategies) {
+        Preconditions.checkState(stopStrategies.length > 0, "Must have at least one stop strategy");
+        List<StopStrategy> stopStrategyList = new ArrayList<StopStrategy>();
+        stopStrategyList.addAll(Arrays.asList(stopStrategies));
+        Preconditions.checkState(!stopStrategyList.contains(null), "Cannot have a null stop strategy");
+        return new CompositeStopStrategy(stopStrategyList);
     }
 }

@@ -16,15 +16,19 @@
 
 package com.dyngr;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.dyngr.concurrent.DirectExecutorService;
+import com.dyngr.core.Attempt;
+import com.dyngr.core.AttemptMaker;
 import com.dyngr.core.DefaultPoller;
 import com.dyngr.core.StopStrategies;
+import com.dyngr.core.StopStrategy;
 import com.dyngr.core.WaitStrategies;
 import com.dyngr.core.WaitStrategy;
-import com.dyngr.core.AttemptMaker;
-import com.dyngr.core.StopStrategy;
+import com.dyngr.core.strategy.CompositeStopStrategy;
+import com.dyngr.core.strategy.NotStopEvenExceptionStrategy;
 import com.dyngr.util.Preconditions;
 
 /**
@@ -55,6 +59,22 @@ public class PollerBuilder<V> {
     }
 
     /**
+     * Sets a list of wait strategy used to decide how long to sleep between failed attempts. Actual wait time will be a total of all computed wait time.
+     *
+     * @param waitStrategies list of strategies used to sleep between failed attempts
+     * @return <code>this</code>
+     * @throws IllegalStateException if a wait strategy has already been set.
+     */
+    public PollerBuilder<V> withWaitStrategy(WaitStrategy... waitStrategies) {
+        Preconditions.checkNotNull(waitStrategies, "waitStrategy should not be null");
+        for (WaitStrategy strategy : waitStrategies) {
+            Preconditions.checkNotNull(strategy, "waitStrategy should not be null");
+        }
+        this.waitStrategy = WaitStrategies.join(waitStrategies);
+        return this;
+    }
+
+    /**
      * Sets the stop strategy used to decide when to stop retrying. The default strategy is to not stop at all .
      *
      * @param stopStrategy the strategy used to decide when to stop retrying
@@ -65,6 +85,22 @@ public class PollerBuilder<V> {
         Preconditions.checkNotNull(stopStrategy, "stopStrategy should not be null");
         Preconditions.checkState(this.stopStrategy == null, "a stopStrategy has already been set %s", this.stopStrategy);
         this.stopStrategy = stopStrategy;
+        return this;
+    }
+
+    /**
+     * Sets a list of stop strategies used to decide when to stop retrying. polling will stop if any stop strategy's condition is fulfilled.
+     *
+     * @param stopStrategies list of strategies used to decide when to stop retrying.
+     * @return <code>this</code>
+     * @throws IllegalStateException if a stop strategy has already been set.
+     */
+    public PollerBuilder<V> withStopStrategy(StopStrategy... stopStrategies) {
+        Preconditions.checkState(this.stopStrategy == null, "a stopStrategy has already been set %s", this.stopStrategy);
+        for (StopStrategy strategy : stopStrategies) {
+            Preconditions.checkNotNull(strategy, "stopStrategy should not be null");
+        }
+        this.stopStrategy = StopStrategies.join(stopStrategies);
         return this;
     }
 
@@ -105,7 +141,7 @@ public class PollerBuilder<V> {
         Preconditions.checkNotNull(attemptMaker, "attemptMaker should not be null, please call polling() to add a AttemptMaker");
         return new DefaultPoller<V>(
                 attemptMaker,
-                stopStrategy == null ? StopStrategies.neverStop() : stopStrategy,
+                buildStopStrategy(),
                 waitStrategy == null ? WaitStrategies.noWait() : waitStrategy,
                 executorService == null ? new DirectExecutorService() : executorService
         );
@@ -119,5 +155,52 @@ public class PollerBuilder<V> {
      */
     public static <V> PollerBuilder<V> newBuilder() {
         return new PollerBuilder<V>();
+    }
+
+    /**
+     * Build a stop strategy based on user defined ones.
+     */
+    private StopStrategy buildStopStrategy() {
+        if (stopStrategy == null) {
+            stopStrategy = StopStrategies.neverStop();
+        }
+
+        boolean stopIfException = true;
+        if (stopStrategy instanceof CompositeStopStrategy) {
+            List<StopStrategy> stopStrategyList = ((CompositeStopStrategy) stopStrategy).getStopStrategies();
+            for (StopStrategy strategy : stopStrategyList) {
+                if (strategy instanceof NotStopEvenExceptionStrategy) {
+                    stopIfException = false;
+                }
+            }
+        } else {
+            if (stopStrategy instanceof NotStopEvenExceptionStrategy) {
+                stopIfException = false;
+            }
+        }
+
+        return new MayStopIfExceptionStopStrategy(stopIfException, stopStrategy);
+    }
+
+    /**
+     * A wrapper stop strategy that may or may not stop if exception occurred.
+     */
+    private static class MayStopIfExceptionStopStrategy implements StopStrategy {
+        private final boolean stopIfException;
+        private final StopStrategy stopStrategy;
+
+        public MayStopIfExceptionStopStrategy(boolean stopIfException, StopStrategy stopStrategy) {
+            this.stopIfException = stopIfException;
+            this.stopStrategy = stopStrategy;
+        }
+
+        @Override
+        public boolean shouldStop(Attempt failedAttempt) {
+            if (stopIfException && failedAttempt.hasException()) {
+                return true;
+            } else {
+                return stopStrategy.shouldStop(failedAttempt);
+            }
+        }
     }
 }

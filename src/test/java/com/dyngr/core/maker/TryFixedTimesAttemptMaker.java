@@ -31,6 +31,10 @@ public class TryFixedTimesAttemptMaker implements AttemptMaker<Void> {
         this.triedNum = 0;
     }
 
+    public int getTriedNum() {
+        return triedNum;
+    }
+
     @Override
     public AttemptResult<Void> process() {
         if (triedNum++ < limit) {

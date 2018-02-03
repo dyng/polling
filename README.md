@@ -67,15 +67,15 @@ public String fetchMessage() throws ExecutionException, InterruptedException {
 }
 ``` 
 
-You can see that **number of lines is reduced to 70%**, and the latter code is more clean, easier to read.
+You can see **the code is reduced to 70%**, and more clear, easier to read.
 
 The power of Polling is even more than above example. Many builtin `StopStrategy` and `WaitStrategy` are available out of box, with them you can do *random waiting*, *fibonacci waiting*, *stop after a given period*, etc.
 
 ## Feature
 
-- Zero Dependency!
-- Polling in given Thread/ExecutorService
-- Java 1.7+ supported
+- No Dependency!
+- Flexible polling either in current Thread or a dedicated Thread/ExecutorService.
+- Java 1.7+ supported.
 
 # How To Install
 

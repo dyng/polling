@@ -26,11 +26,9 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import com.dyngr.core.strategy.CompositeStopStrategy;
-import com.dyngr.core.strategy.NotStopEvenExceptionStrategy;
 import com.dyngr.core.strategy.NeverStopStrategy;
 import com.dyngr.core.strategy.StopAfterAttemptStrategy;
 import com.dyngr.core.strategy.StopAfterDelayStrategy;
-import com.dyngr.core.strategy.StopIfExceptionStrategy;
 import com.dyngr.util.Preconditions;
 
 /**
@@ -53,24 +51,6 @@ public final class StopStrategies {
      */
     public static StopStrategy neverStop() {
         return NEVER_STOP;
-    }
-
-    /**
-     * Returns a SPECIAL stop strategy which instruct Poller NOT to stop even exception occurred.
-     *
-     * @return a stop strategy which instruct Poller NOT to stop even exception occurred.
-     */
-    public static StopStrategy notStopEvenException() {
-        return new NotStopEvenExceptionStrategy();
-    }
-
-    /**
-     * Returns a stop strategy which stops if any exception occurred.
-     *
-     * @return a stop strategy which stops at exception
-     */
-    public static StopStrategy stopIfException() {
-        return new StopIfExceptionStrategy();
     }
 
     /**

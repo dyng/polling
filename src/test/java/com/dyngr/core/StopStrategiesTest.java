@@ -20,6 +20,7 @@ package com.dyngr.core;
 
 import java.util.concurrent.TimeUnit;
 
+import com.dyngr.core.strategy.StopIfExceptionStrategy;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -37,8 +38,8 @@ public class StopStrategiesTest {
 
     @Test
     public void testStopIfException() throws Exception {
-        assertFalse(StopStrategies.stopIfException().shouldStop(failedAttempt(null)));
-        assertTrue(StopStrategies.stopIfException().shouldStop(failedAttempt(new IllegalStateException())));
+        assertFalse(new StopIfExceptionStrategy().shouldStop(failedAttempt(null)));
+        assertTrue(new StopIfExceptionStrategy().shouldStop(failedAttempt(new IllegalStateException())));
     }
 
     @Test

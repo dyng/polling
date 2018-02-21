@@ -157,6 +157,7 @@ public class DefaultPollerTest {
                         throw new IllegalStateException();
                     }
                 })
+                .stopIfException(true)
                 .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .build();
 
@@ -172,7 +173,7 @@ public class DefaultPollerTest {
     }
 
     @Test
-    public void testPoller_does_not_stop_if_NotStopEvenExceptionStrategy_is_configured() throws Exception {
+    public void testPoller_does_not_stop_if_stopIfException_is_false() throws Exception {
         // prepare
         final AtomicLong attemptsCount = new AtomicLong(0);
         Poller<Void> poller = PollerBuilder.<Void>newBuilder()
@@ -183,10 +184,8 @@ public class DefaultPollerTest {
                         throw new IllegalStateException();
                     }
                 })
-                .withStopStrategy(
-                        StopStrategies.notStopEvenException(),
-                        StopStrategies.stopAfterAttempt(3)
-                )
+                .stopIfException(false)
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .build();
 
         // verify
@@ -286,7 +285,7 @@ public class DefaultPollerTest {
     public void testAttemptResult_unexpected_exception() throws Exception {
         // prepare
         Poller<Void> poller = PollerBuilder.<Void>newBuilder()
-                .withStopStrategy(StopStrategies.stopIfException())
+                .stopIfException(true)
                 .polling(new AttemptMaker<Void>() {
                     @Override
                     public AttemptResult<Void> process() {

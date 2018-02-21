@@ -16,7 +16,6 @@
 
 package com.dyngr;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.dyngr.concurrent.DirectExecutorService;
@@ -27,8 +26,6 @@ import com.dyngr.core.StopStrategies;
 import com.dyngr.core.StopStrategy;
 import com.dyngr.core.WaitStrategies;
 import com.dyngr.core.WaitStrategy;
-import com.dyngr.core.strategy.CompositeStopStrategy;
-import com.dyngr.core.strategy.NotStopEvenExceptionStrategy;
 import com.dyngr.util.Preconditions;
 
 /**
@@ -39,6 +36,7 @@ import com.dyngr.util.Preconditions;
  */
 public class PollerBuilder<V> {
     private AttemptMaker<V> attemptMaker;
+    private Boolean         stopIfException;
     private StopStrategy    stopStrategy;
     private WaitStrategy    waitStrategy;
     private ExecutorService executorService;
@@ -71,6 +69,17 @@ public class PollerBuilder<V> {
             Preconditions.checkNotNull(strategy, "waitStrategy should not be null");
         }
         this.waitStrategy = WaitStrategies.join(waitStrategies);
+        return this;
+    }
+
+    /**
+     * Set if poller should stop when an exception is thrown. The default value is <code>true</code>.
+     *
+     * @param stopIfException whether poller should stop if exception occurred
+     * @return <code>this</code>
+     */
+    public PollerBuilder<V> stopIfException(boolean stopIfException) {
+        this.stopIfException = stopIfException;
         return this;
     }
 
@@ -165,18 +174,8 @@ public class PollerBuilder<V> {
             stopStrategy = StopStrategies.neverStop();
         }
 
-        boolean stopIfException = true;
-        if (stopStrategy instanceof CompositeStopStrategy) {
-            List<StopStrategy> stopStrategyList = ((CompositeStopStrategy) stopStrategy).getStopStrategies();
-            for (StopStrategy strategy : stopStrategyList) {
-                if (strategy instanceof NotStopEvenExceptionStrategy) {
-                    stopIfException = false;
-                }
-            }
-        } else {
-            if (stopStrategy instanceof NotStopEvenExceptionStrategy) {
-                stopIfException = false;
-            }
+        if (stopIfException == null) {
+            stopIfException = true;
         }
 
         return new MayStopIfExceptionStopStrategy(stopIfException, stopStrategy);

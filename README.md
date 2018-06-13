@@ -85,7 +85,7 @@ The power of Polling is even more than above example. Many builtin `StopStrategy
 <dependency>
     <groupId>com.dyngr</groupId>
     <artifactId>polling</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 

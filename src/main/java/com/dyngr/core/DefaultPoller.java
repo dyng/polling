@@ -92,7 +92,11 @@ public class DefaultPoller<V> implements Poller<V> {
 
                 Attempt failedAttempt = buildAttempt(attemptCount, startTime, System.currentTimeMillis(), result.getCause());
                 if (stopStrategy.shouldStop(failedAttempt)) {
-                    throw new PollerStoppedException();
+                    if (failedAttempt.hasException()) {
+                        throw new PollerStoppedException(failedAttempt.getExceptionCause());
+                    } else {
+                        throw new PollerStoppedException();
+                    }
                 }
 
                 long waitTime = waitStrategy.computeWaitTime(failedAttempt);

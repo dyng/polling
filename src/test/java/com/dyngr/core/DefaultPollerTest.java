@@ -8,15 +8,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.dyngr.core.maker.CounterAttemptMaker;
-import com.dyngr.exception.PollerInterruptedException;
-import org.junit.Test;
 import com.dyngr.Poller;
 import com.dyngr.PollerBuilder;
+import com.dyngr.core.maker.CounterAttemptMaker;
 import com.dyngr.core.maker.TimerAttemptMaker;
 import com.dyngr.core.maker.TryFixedTimesAttemptMaker;
+import com.dyngr.exception.PollerInterruptedException;
 import com.dyngr.exception.PollerStoppedException;
 import com.dyngr.exception.UserBreakException;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -154,7 +154,7 @@ public class DefaultPollerTest {
                     @Override
                     public AttemptResult<Void> process() throws Exception {
                         attemptsCount.incrementAndGet();
-                        throw new IllegalStateException();
+                        throw new IllegalStateException("Intentional Exception");
                     }
                 })
                 .stopIfException(true)
@@ -168,6 +168,9 @@ public class DefaultPollerTest {
         } catch (ExecutionException e) {
             assertThat(e.getCause())
                     .isInstanceOf(PollerStoppedException.class);
+            assertThat(e.getCause().getCause())
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Intentional Exception");
             assertThat(attemptsCount.get()).isEqualTo(1);
         }
     }

@@ -88,8 +88,7 @@ public final class StopStrategies {
      */
     public static StopStrategy join(StopStrategy... stopStrategies) {
         Preconditions.checkState(stopStrategies.length > 0, "Must have at least one stop strategy");
-        List<StopStrategy> stopStrategyList = new ArrayList<StopStrategy>();
-        stopStrategyList.addAll(Arrays.asList(stopStrategies));
+        List<StopStrategy> stopStrategyList = new ArrayList<StopStrategy>(Arrays.asList(stopStrategies));
         Preconditions.checkState(!stopStrategyList.contains(null), "Cannot have a null stop strategy");
         return new CompositeStopStrategy(stopStrategyList);
     }

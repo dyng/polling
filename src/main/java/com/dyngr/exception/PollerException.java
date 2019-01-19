@@ -16,23 +16,24 @@
 package com.dyngr.exception;
 
 /**
- * An exception implies polling is aborted because of an user break.
+ * Poller's exception base.
  *
- * Created by dingye on 17/12/24.
+ * Created by dingye on 19/1/9.
  */
-public class UserBreakException extends PollerException {
-    public UserBreakException() {
+public class PollerException extends RuntimeException {
+    public PollerException() {
+        super();
     }
 
-    public UserBreakException(String message) {
+    public PollerException(String message) {
         super(message);
     }
 
-    public UserBreakException(String message, Throwable cause) {
+    public PollerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public UserBreakException(Throwable cause) {
+    public PollerException(Throwable cause) {
         super(cause);
     }
 }

@@ -10,12 +10,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.dyngr.Poller;
 import com.dyngr.PollerBuilder;
+import com.dyngr.Polling;
 import com.dyngr.core.maker.CounterAttemptMaker;
 import com.dyngr.core.maker.TimerAttemptMaker;
 import com.dyngr.core.maker.TryFixedTimesAttemptMaker;
 import com.dyngr.exception.PollerInterruptedException;
 import com.dyngr.exception.PollerStoppedException;
 import com.dyngr.exception.UserBreakException;
+import com.dyngr.util.PollerExceptions;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,6 +126,7 @@ public class DefaultPollerTest {
         } catch (ExecutionException e) {
             assertThat(e.getCause())
                     .isInstanceOf(PollerStoppedException.class);
+            assertThat(PollerExceptions.isStopped(e)).isTrue();
         }
 
         assertThat(attemptMaker.getCount())
@@ -345,6 +348,23 @@ public class DefaultPollerTest {
         } catch (ExecutionException e) {
             assertThat(e.getCause())
                     .isInstanceOf(PollerInterruptedException.class);
+            assertThat(PollerExceptions.isInterrupted(e)).isTrue();
         }
+    }
+
+    @Test
+    public void testPollerExecute() {
+        String result = Polling
+                .stopAfterAttempt(3)
+                .stopAfterDelay(3, TimeUnit.SECONDS)
+                .run(new AttemptMaker<String>() {
+                    @Override
+                    public AttemptResult<String> process() throws Exception {
+                        return AttemptResults.finishWith("world");
+                    }
+                });
+
+        // verify
+        assertThat(result).isEqualTo("world");
     }
 }

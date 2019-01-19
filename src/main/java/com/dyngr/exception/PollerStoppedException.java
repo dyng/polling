@@ -22,7 +22,7 @@ import com.dyngr.core.StopStrategy;
  *
  * Created by dingye on 17/12/24.
  */
-public class PollerStoppedException extends RuntimeException {
+public class PollerStoppedException extends PollerException {
     public PollerStoppedException() {
     }
 

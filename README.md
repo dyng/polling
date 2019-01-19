@@ -46,11 +46,11 @@ public String fetchMessage() throws InterruptedException {
 With Polling, the code can be simplified into
 
 ```java
-public String fetchMessage() throws ExecutionException, InterruptedException {
-    Poller<String> poller = PollerBuilder.<String>newBuilder()
-            .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-            .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-            .polling(new AttemptMaker<String>() {
+public String fetchMessage() {
+    return Polling
+            .waitPeriodly(1, TimeUnit.SECONDS)
+            .stopAfterAttempt(3)
+            .run(new AttemptMaker<String>() {
                 @Override
                 public AttemptResult<String> process() throws Exception {
                     Response resp = fetchMessageFromRemote();
@@ -60,10 +60,7 @@ public String fetchMessage() throws ExecutionException, InterruptedException {
                         return AttemptResults.justContinue();
                     }
                 }
-            })
-            .build();
-
-    return poller.start().get();
+            });
 }
 ``` 
 

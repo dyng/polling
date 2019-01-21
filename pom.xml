@@ -6,7 +6,7 @@
 
     <groupId>com.dyngr</groupId>
     <artifactId>polling</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
 
     <name>polling</name>
     <description>A missing polling library for Java.</description>
@@ -123,7 +123,7 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
                         <configuration>
-                            <defaultKeyring>ye.ding.1986@gmail.com</defaultKeyring>
+                            <keyname>ye.ding.1986@gmail.com</keyname>
                         </configuration>
                         <executions>
                             <execution>

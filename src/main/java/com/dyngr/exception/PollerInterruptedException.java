@@ -20,7 +20,7 @@ package com.dyngr.exception;
  *
  * Created by dingye on 17/12/24.
  */
-public class PollerInterruptedException extends RuntimeException {
+public class PollerInterruptedException extends PollerException {
     public PollerInterruptedException() {
     }
 
